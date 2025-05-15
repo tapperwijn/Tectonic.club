@@ -5,8 +5,7 @@ const config: Config = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
-  ],
+    './app/**/*.{js,ts,jsx,tsx,mdx}',  ],
   theme: {
     extend: {
       colors: {
@@ -87,15 +86,14 @@ const config: Config = {
       },
       transitionDuration: {
         '300': '300ms',
-      },
-      boxShadow: {
+      },      boxShadow: {
         'subtle': '0 4px 14px 0 rgba(0, 0, 0, 0.1)',
         'soft': '0 5px 15px rgba(0, 0, 0, 0.08)',
         'blue': '0 4px 14px 0 rgba(88, 101, 242, 0.2)',
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
 };
 
 export default config;

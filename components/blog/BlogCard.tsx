@@ -5,7 +5,7 @@ import Image from "next/image";
 import { CalendarDays, Clock, Tag } from "lucide-react";
 import { motion } from "framer-motion";
 
-interface BlogCardProps {
+interface Post {
   title: string;
   excerpt: string;
   slug: string;
@@ -13,57 +13,55 @@ interface BlogCardProps {
   readingTime: string;
   category: string;
   coverImage: string;
-  index: number;
+}
+
+interface BlogCardProps {
+  post: Post;
 }
 
 const MotionDiv = motion.div;
 
-const BlogCard = ({
-  title,
-  excerpt,
-  slug,
-  date,
-  readingTime,
-  category,
-  coverImage,
-  index,
-}: BlogCardProps) => {
+const BlogCard = ({ post }: BlogCardProps) => {
+  const formattedDate = new Date(post.date).toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric'
+  });
+
   return (
     <MotionDiv
       initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="bg-card rounded-lg overflow-hidden shadow-soft hover:shadow-blue transition-all duration-300"
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.1 }}
+      className="group relative rounded-lg overflow-hidden"
     >
-      <Link href={`/blog/${slug}`} className="group">
-        <div className="relative h-48 overflow-hidden">
+      <Link href={`/blog/${post.slug}`} className="block">
+        <div className="aspect-w-16 aspect-h-9 relative">
           <Image
-            src={coverImage}
-            alt={title}
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            src={post.coverImage}
+            alt={post.title}
             fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
-          <div className="absolute top-0 left-0 m-4">
-            <span className="bg-primary/90 text-primary-foreground text-xs px-2 py-1 rounded-md">
-              {category}
+        </div>
+        <div className="p-4 bg-card">
+          <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
+            <span className="flex items-center gap-1">
+              <CalendarDays size={16} />
+              {formattedDate}
+            </span>
+            <span className="flex items-center gap-1">
+              <Clock size={16} />
+              {post.readingTime}
             </span>
           </div>
-        </div>
-        <div className="p-6">
-          <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
-            {title}
+          <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
+            {post.title}
           </h3>
-          <p className="text-muted-foreground mb-4 line-clamp-2">{excerpt}</p>
-          <div className="flex items-center text-xs text-muted-foreground space-x-4">
-            <div className="flex items-center">
-              <CalendarDays className="h-3 w-3 mr-1" />
-              <span>{date}</span>
-            </div>
-            <div className="flex items-center">
-              <Clock className="h-3 w-3 mr-1" />
-              <span>{readingTime}</span>
-            </div>
+          <p className="text-muted-foreground line-clamp-2 mb-4">{post.excerpt}</p>
+          <div className="flex items-center gap-2">
+            <Tag size={16} className="text-primary" />
+            <span className="text-sm font-medium text-primary">{post.category}</span>
           </div>
         </div>
       </Link>

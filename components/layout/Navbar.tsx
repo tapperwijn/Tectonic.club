@@ -29,7 +29,6 @@ const Navbar = () => {
     { href: '/', label: 'Home', icon: <Grid size={18} /> },
     { href: '/blog', label: 'Blog', icon: <BookOpen size={18} /> },
     { href: '/solver', label: 'Solver', icon: <PenTool size={18} /> },
-    { href: '/builder', label: 'Builder', icon: <GameController2 size={18} /> },
     { href: '/leaderboard', label: 'Leaderboard', icon: <Trophy size={18} /> },
   ];
 
