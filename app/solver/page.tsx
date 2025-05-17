@@ -10,9 +10,8 @@ export default function SolverPage() {
             Enter your Tectonic puzzle and get a solution with step-by-step explanations.
           </p>
         </div>
-        
-        <div className="flex justify-center">
-          <TectonicGrid mode="solver" />
+          <div className="flex justify-center">
+          <TectonicGrid initialMode="solver" initialWidth={6} initialHeight={6} />
         </div>
       </div>
     </div>
