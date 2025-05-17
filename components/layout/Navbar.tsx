@@ -23,13 +23,13 @@ const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
   // Navigation links
   const navLinks = [
     { href: '/', label: 'Home', icon: <Grid size={18} /> },
     { href: '/blog', label: 'Blog', icon: <BookOpen size={18} /> },
     { href: '/solver', label: 'Solver', icon: <PenTool size={18} /> },
-    { href: '/leaderboard', label: 'Leaderboard', icon: <Trophy size={18} /> },
+    // TODO: Implement leaderboard
+    // { href: '/leaderboard', label: 'Leaderboard', icon: <Trophy size={18} /> },
   ];
 
   return (

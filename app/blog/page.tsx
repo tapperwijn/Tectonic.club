@@ -1,20 +1,9 @@
-import Link from "next/link";
-import BlogCard from "@/components/blog/BlogCard";
+import BlogList from "@/components/blog/BlogList";
 import { promises as fs } from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 
-interface Post {
-  title: string;
-  date: string;
-  excerpt: string;
-  category: string;
-  coverImage: string;
-  readingTime: string;
-  slug: string;
-}
-
-async function getPosts(): Promise<Post[]> {
+async function getPosts() {
   const postsDirectory = path.join(process.cwd(), 'app/blog/posts');
   const files = await fs.readdir(postsDirectory);
   
@@ -27,7 +16,7 @@ async function getPosts(): Promise<Post[]> {
       return {
         ...data,
         slug: filename.replace('.mdx', ''),
-      } as Post;
+      };
     })
   );
   
@@ -40,13 +29,17 @@ export default async function BlogPage() {
   const posts = await getPosts();
   
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold mb-8">Blog</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {posts.map((post) => (
-          <BlogCard key={post.slug} post={post} />
-        ))}
+    <section className="py-16 md:py-24">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="text-center mb-12">
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">Latest Articles</h1>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Explore our latest articles, tutorials, and strategies to enhance your puzzle-solving abilities.
+          </p>
+        </div>
+
+        <BlogList posts={posts} />
       </div>
-    </div>
+    </section>
   );
 }
