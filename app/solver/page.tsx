@@ -1,3 +1,5 @@
+"use client";
+
 import TectonicGrid from "@/components/tectonic-grid/TectonicGrid";
 
 export default function SolverPage() {
@@ -9,8 +11,15 @@ export default function SolverPage() {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Enter your Tectonic puzzle and get a solution with step-by-step explanations.
           </p>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <br />
+            1. Built the regions in builder mode. <br />
+            2. Input the givens, numbers and or scribbles in the solver mode.
+            <br />
+            3. Finally click show next step to get the solution!
+          </p>
         </div>
-          <div className="flex justify-center">
+        <div className="flex justify-center mb-12">
           <TectonicGrid initialMode="solver" initialWidth={6} initialHeight={6} />
         </div>
       </div>

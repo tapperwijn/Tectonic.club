@@ -62,7 +62,10 @@ export default function RegionList({
             </Button>
           </div>
         ))}
-      </div>
+      </div><br />
+      <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Add regions, and click on a region number to activate, then click a cell to assign it to that region</p>
+        
+        
     </div>
   );
 }

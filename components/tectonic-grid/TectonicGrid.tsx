@@ -14,6 +14,7 @@ interface TectonicGridProps {
   initialWidth?: number;
   initialHeight?: number;
   initialMode?: "solver" | "builder";
+  onShare?: (url: string) => void;
 }
 
 const MotionDiv = motion.div;
@@ -169,16 +170,13 @@ const decodePuzzleData = (hash: string): { puzzle: Puzzle; mode: "solver" | "bui
 const TectonicGrid = ({
   initialWidth = 5,
   initialHeight = 5,
-  initialMode = "builder", // Default to builder when no hash present
+  initialMode = "solver",
+  onShare,
 }: TectonicGridProps) => {
   const { toast } = useToast();
   const [width, setWidth] = useState(initialWidth);
   const [height, setHeight] = useState(initialHeight);
-  // Set initial mode based on whether there's a hash in the URL
-  const [mode, setMode] = useState<"solver" | "builder">(() => {
-    // If there's a hash in the URL, start in solver mode
-    return window?.location?.hash ? "solver" : initialMode;
-  });
+  const [mode, setMode] = useState<"solver" | "builder">(initialMode);
   const [cells, setCells] = useState<CellData[][]>(createGrid(width, height));
   const [selectedCell, setSelectedCell] = useState<CellID | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<number | null>(null);
@@ -237,21 +235,6 @@ const TectonicGrid = ({
     // Clean up event listener
     return () => window.removeEventListener('hashchange', loadPuzzleFromHash);
   }, [toast]);
-
-  // Share puzzle function
-  const handleSharePuzzle = useCallback(() => {
-    const puzzle = getPuzzleState(width, height, cells);
-    const hash = encodePuzzleData(puzzle, mode);
-    const url = `${window.location.origin}${window.location.pathname}#${hash}`;
-    
-    // Copy to clipboard
-    navigator.clipboard.writeText(url).then(() => {
-      toast({
-        description: "Shareable link copied to clipboard!",
-        duration: 3000
-      });
-    });
-  }, [width, height, cells, mode]);
 
   const initializeGrid = useCallback((w: number, h: number) => {
     setCells(createGrid(w, h));
@@ -444,6 +427,23 @@ const TectonicGrid = ({
       </div>
     </div>
   );
+
+  const [copied, setCopied] = useState(false);
+
+  // Share puzzle function
+  const handleSharePuzzle = useCallback(() => {
+    const puzzle = getPuzzleState(width, height, cells);
+    const hash = encodePuzzleData(puzzle, mode);
+    const url = `${window.location.origin}${window.location.pathname}#${hash}`;
+    
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }).catch(err => {
+      console.error('Failed to copy URL:', err);
+    });
+  }, [width, height, cells, mode]);
+
   return (
     <div className="flex gap-6 max-w-[1200px] mx-auto">
       <div className="flex-1 space-y-6">
@@ -457,19 +457,9 @@ const TectonicGrid = ({
             onModeChange={setMode}
             onReset={handleReset}
           />
-          <Button 
-            variant="outline" 
-            size="icon"
-            onClick={handleSharePuzzle}
-            className="h-9 w-9 shrink-0"
-            title="Share Puzzle"
-          >
-            <Share2 className="h-4 w-4" />
-          </Button>
         </div>
 
         {renderGrid()}
-
         {mode === "builder" && (
           <RegionList
             regions={availableRegions}
@@ -497,9 +487,21 @@ const TectonicGrid = ({
             }}
           />
         )}
-        
         {renderNumberControls()}
-      </div>      {mode === "solver" && (
+        
+        <div className="flex justify-center mt-8">
+          <Button
+            variant="default"
+            size="lg"
+            onClick={handleSharePuzzle}
+            className="px-8 py-6 text-lg font-semibold flex items-center gap-2 min-w-[200px] transition-all"
+          >
+            <Share2 className="h-6 w-6" />
+            {copied ? "Copied!" : "Share Puzzle URL"}
+          </Button>
+        </div>
+      </div>
+      {mode === "solver" && (
         <div className="w-80 flex flex-col sticky top-24">
           <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
             <div className="p-4 border-b">
