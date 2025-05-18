@@ -5,12 +5,20 @@ import FeatureCard from "./FeatureCard";
 
 const features = [
   {
-    title: "How to Play",
-    description: "Learn the rules and strategies to master Tectonic puzzles and improve your logical thinking.",
+    title: "Beginners Guide How to Play",
+    description: "Learn the rules of Tectonic puzzles and how to master Tectonic puzzles and improve your logical thinking.",
     icon: HelpCircle,
     imageUrl: "https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     link: "/blog/how-to-play",
     linkText: "Learn More",
+  },
+  {
+    title: "Advanced tactics & strategies",
+    description: "Explore our latest articles, tips, and strategies to enhance your puzzle-solving abilities.",
+    icon: BookText,
+    imageUrl: "https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+    link: "/blog",
+    linkText: "Read Blog",
   },
   {
     title: "Tectonic Solver",
@@ -20,30 +28,7 @@ const features = [
     link: "/solver",
     linkText: "Use Solver",
   },
-  {
-    title: "Tectonic Builder",
-    description: "Create your own Tectonic puzzles with our intuitive builder. Share your creations with the community.",
-    icon: Settings,
-    imageUrl: "https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    link: "/builder",
-    linkText: "Start Building",
-  },
-  {
-    title: "Latest Blog",
-    description: "Explore our latest articles, tips, and strategies to enhance your puzzle-solving abilities.",
-    icon: BookText,
-    imageUrl: "https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    link: "/blog",
-    linkText: "Read Blog",
-  },
-  {
-    title: "Mobile Game",
-    description: "Download our mobile app and play Tectonic puzzles anywhere, anytime. Available on iOS and Android.",
-    icon: Download,
-    imageUrl: "https://images.pexels.com/photos/3182813/pexels-photo-3182813.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    link: "/download",
-    linkText: "Get App",
-  },
+
 ];
 
 const FeaturesSection = () => {

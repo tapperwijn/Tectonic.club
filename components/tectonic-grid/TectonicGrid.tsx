@@ -7,6 +7,8 @@ import GridControls from "./GridControls";
 import RegionList from "./RegionList";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import { CellData, Puzzle, CellID } from "@/types/grid";
+import { useToast } from "@/hooks/use-toast";
+import { Share2 } from "lucide-react";
 
 interface TectonicGridProps {
   initialWidth?: number;
@@ -119,14 +121,64 @@ const validateRegions = (cells: CellData[][]): string[] => {
   return errors;
 };
 
+// Encode puzzle data to URL hash
+const encodePuzzleData = (puzzle: Puzzle, mode: "solver" | "builder"): string => {
+  // Create minimal data structure with just what's needed
+  const data = {
+    w: puzzle.width,
+    h: puzzle.height,
+    m: mode,
+    // Create a flat array of region IDs and values
+    r: puzzle.cells.flat().map(cell => cell.regionId),
+    v: puzzle.cells.flat().map(cell => cell.value),
+    s: puzzle.cells.flat().map(cell => cell.scribbles)
+  };
+  return btoa(JSON.stringify(data));
+};
+
+// Decode puzzle data from URL hash
+const decodePuzzleData = (hash: string): { puzzle: Puzzle; mode: "solver" | "builder" } | null => {
+  try {
+    const data = JSON.parse(atob(hash));
+    
+    // Create cells array
+    const cells: CellData[][] = Array(data.h).fill(null).map((_, row) =>
+      Array(data.w).fill(null).map((_, col) => {
+        const idx = row * data.w + col;
+        return {
+          id: `${row}-${col}`,
+          row,
+          col,
+          regionId: data.r[idx],
+          value: data.v[idx],
+          scribbles: data.s[idx]
+        };
+      })
+    );
+
+    return {
+      puzzle: { width: data.w, height: data.h, cells },
+      mode: data.m
+    };
+  } catch (e) {
+    console.error("Failed to decode puzzle data:", e);
+    return null;
+  }
+};
+
 const TectonicGrid = ({
   initialWidth = 5,
   initialHeight = 5,
-  initialMode = "solver",
+  initialMode = "builder", // Default to builder when no hash present
 }: TectonicGridProps) => {
+  const { toast } = useToast();
   const [width, setWidth] = useState(initialWidth);
   const [height, setHeight] = useState(initialHeight);
-  const [mode, setMode] = useState<"solver" | "builder">(initialMode);
+  // Set initial mode based on whether there's a hash in the URL
+  const [mode, setMode] = useState<"solver" | "builder">(() => {
+    // If there's a hash in the URL, start in solver mode
+    return window?.location?.hash ? "solver" : initialMode;
+  });
   const [cells, setCells] = useState<CellData[][]>(createGrid(width, height));
   const [selectedCell, setSelectedCell] = useState<CellID | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<number | null>(null);
@@ -154,6 +206,52 @@ const TectonicGrid = ({
       availableRegions: Array.from(availableRegions),
     });
   }, [cells, width, height, mode, availableRegions]);
+  // Load puzzle from URL hash if present
+  useEffect(() => {
+    const loadPuzzleFromHash = () => {
+      const hash = window.location.hash.slice(1); // Remove the # character
+      if (hash) {
+        const data = decodePuzzleData(hash);
+        if (data) {
+          setWidth(data.puzzle.width);
+          setHeight(data.puzzle.height);
+          setMode(data.mode);
+          setCells(data.puzzle.cells);
+          // Extract available regions from the loaded puzzle
+          const regions = new Set(data.puzzle.cells.flat().map(cell => cell.regionId).filter(id => id > 0));
+          setAvailableRegions(regions);
+          toast({
+            description: "Puzzle loaded from shared link",
+            duration: 3000
+          });
+        }
+      }
+    };
+
+    // Load puzzle on initial mount
+    loadPuzzleFromHash();
+
+    // Add event listener for hash changes
+    window.addEventListener('hashchange', loadPuzzleFromHash);
+
+    // Clean up event listener
+    return () => window.removeEventListener('hashchange', loadPuzzleFromHash);
+  }, [toast]);
+
+  // Share puzzle function
+  const handleSharePuzzle = useCallback(() => {
+    const puzzle = getPuzzleState(width, height, cells);
+    const hash = encodePuzzleData(puzzle, mode);
+    const url = `${window.location.origin}${window.location.pathname}#${hash}`;
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(url).then(() => {
+      toast({
+        description: "Shareable link copied to clipboard!",
+        duration: 3000
+      });
+    });
+  }, [width, height, cells, mode]);
 
   const initializeGrid = useCallback((w: number, h: number) => {
     setCells(createGrid(w, h));
@@ -347,48 +445,92 @@ const TectonicGrid = ({
     </div>
   );
   return (
-    <div className="relative max-w-2xl mx-auto space-y-6">
-      <GridControls
-        width={width}
-        height={height}
-        mode={mode}
-        onWidthChange={handleWidthChange}
-        onHeightChange={handleHeightChange}
-        onModeChange={setMode}
-        onReset={handleReset}
-      />
+    <div className="flex gap-6 max-w-[1200px] mx-auto">
+      <div className="flex-1 space-y-6">
+        <div className="flex items-center justify-between gap-4">
+          <GridControls
+            width={width}
+            height={height}
+            mode={mode}
+            onWidthChange={handleWidthChange}
+            onHeightChange={handleHeightChange}
+            onModeChange={setMode}
+            onReset={handleReset}
+          />
+          <Button 
+            variant="outline" 
+            size="icon"
+            onClick={handleSharePuzzle}
+            className="h-9 w-9 shrink-0"
+            title="Share Puzzle"
+          >
+            <Share2 className="h-4 w-4" />
+          </Button>
+        </div>
 
-      {renderGrid()}
+        {renderGrid()}
 
-      {mode === "builder" && (
-        <RegionList
-          regions={availableRegions}
-          selectedRegion={selectedRegion}
-          onRegionSelect={setSelectedRegion}
-          onAddRegion={() => {
-            const newRegionNumber = Math.max(...Array.from(availableRegions)) + 1;
-            setAvailableRegions(prev => new Set(Array.from(prev).concat([newRegionNumber])));
-            setSelectedRegion(newRegionNumber);
-          }}
-          onRemoveRegion={(region: number) => {
-            setCells(prev => prev.map(row => 
-              row.map(cell => 
-                cell.regionId === region ? { ...cell, regionId: 0 } : cell
-              )
-            ));
-            setAvailableRegions(prev => {
-              const newRegions = new Set(prev);
-              newRegions.delete(region);
-              return newRegions;
-            });
-            if (selectedRegion === region) {
-              setSelectedRegion(null);
-            }
-          }}
-        />
+        {mode === "builder" && (
+          <RegionList
+            regions={availableRegions}
+            selectedRegion={selectedRegion}
+            onRegionSelect={setSelectedRegion}
+            onAddRegion={() => {
+              const newRegionNumber = Math.max(...Array.from(availableRegions)) + 1;
+              setAvailableRegions(prev => new Set(Array.from(prev).concat([newRegionNumber])));
+              setSelectedRegion(newRegionNumber);
+            }}
+            onRemoveRegion={(region: number) => {
+              setCells(prev => prev.map(row => 
+                row.map(cell => 
+                  cell.regionId === region ? { ...cell, regionId: 0 } : cell
+                )
+              ));
+              setAvailableRegions(prev => {
+                const newRegions = new Set(prev);
+                newRegions.delete(region);
+                return newRegions;
+              });
+              if (selectedRegion === region) {
+                setSelectedRegion(null);
+              }
+            }}
+          />
+        )}
+        
+        {renderNumberControls()}
+      </div>      {mode === "solver" && (
+        <div className="w-80 flex flex-col sticky top-24">
+          <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+            <div className="p-4 border-b">
+              <h3 className="text-lg font-semibold">Solving Steps</h3>
+              <p className="text-sm text-muted-foreground">
+                Get hints and guidance for solving this puzzle
+              </p>
+            </div>
+
+            <div className="p-4 space-y-4">
+              <div className="bg-muted/50 rounded-lg p-3">
+                <p className="text-sm">
+                  First, look for cells that can only contain one possible number based on their region size.
+                </p>
+              </div>
+
+              <div className="bg-accent/20 rounded-lg p-3">
+                <p className="text-sm">
+                  The region in the top-left corner has size 3, meaning it can only contain numbers 1, 2, and 3.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-4 border-t">
+              <Button variant="default" className="w-full" size="sm">
+                Show Next Step
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
-      
-      {renderNumberControls()}
     </div>
   );
 };

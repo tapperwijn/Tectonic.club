@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { ChevronRight, Grid, BookOpen, PenTool } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import Image from "next/image";
 
 const MotionDiv = motion.div;
@@ -11,7 +11,7 @@ const HeroSection = () => {
   return (
     <section className="hero-section relative overflow-hidden py-4 md:py-6">
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center max-w-6xl mx-auto mb-16">
           {/* Left Column - Text Content */}
           <div className="max-w-xl">
             <MotionDiv
@@ -68,38 +68,6 @@ const HeroSection = () => {
             </div>
           </MotionDiv>
         </div>
-
-        {/* Features Section */}
-        <MotionDiv
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="-mt-16 sm:-mt-28 mb-16 sm:mb-24 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto text-center relative z-20"
-        >
-          <div className="flex flex-col items-center">
-            <div className="bg-card p-3 rounded-full mb-4 inline-flex">
-              <Grid className="h-6 w-6 text-primary" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">Daily Challenges</h3>
-            <p className="text-foreground/70">New puzzles every day to keep your mind sharp and engaged</p>
-          </div>
-          
-          <div className="flex flex-col items-center">
-            <div className="bg-card p-3 rounded-full mb-4 inline-flex">
-              <BookOpen className="h-6 w-6 text-primary" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">Learn & Improve</h3>
-            <p className="text-foreground/70">Master techniques with our comprehensive guides and tutorials</p>
-          </div>
-          
-          <div className="flex flex-col items-center">
-            <div className="bg-card p-3 rounded-full mb-4 inline-flex">
-              <PenTool className="h-6 w-6 text-primary" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">Create & Share</h3>
-            <p className="text-foreground/70">Design your own puzzles and challenge the community</p>
-          </div>
-        </MotionDiv>
       </div>
       
       {/* Background blur elements */}

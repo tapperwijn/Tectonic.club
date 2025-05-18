@@ -61,3 +61,44 @@ export interface Puzzle {
 - Per-cell number input or note scribbles
 - Solving steps shown in a chat-style interface
 - The current puzzle data displayed at the bottom of the page in a gray container as code markup
+
+
+
+
+
+
+Based on the current implementation and the required features, here's my proposed workflow:
+
+Grid Setup Components (First Priority)
+
+Add dimension controls (width/height input)
+Create a grid initialization system
+Add a Grid Controls component above the grid with:
+Dimension inputs
+Reset button
+Mode switcher (Build/Solve)
+Region Builder Mode (Second Priority)
+
+Enhance the existing click handling for region assignment
+Add drag functionality for multi-cell selection
+Visual feedback for regions (different colors/borders)
+Region size validation
+Solver Input Mode (Third Priority)
+
+Implement dual input system:
+Direct number input (click to cycle numbers)
+Scribble mode (right-click or modifier key)
+Visual distinction between final numbers and scribbles
+Add input mode toggle (Number/Scribble)
+Solution Steps Display (Fourth Priority)
+
+Add a chat-like interface to the right of the grid
+Create step-by-step solving algorithm
+Animate solving steps
+Allow stepping through solution
+State Management (Throughout)
+
+Save/load puzzle state
+Undo/redo functionality
+Export/import puzzles
+Show puzzle data in code format
